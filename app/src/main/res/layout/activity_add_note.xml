@@ -4,52 +4,61 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp">
+        android:layout_height="wrap_content">
         <ImageView
             android:id="@+id/return_button"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/return_button"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:layout_margin="10dp"/>
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1">
             <LinearLayout
                 android:id="@+id/select_time"
-                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp">
-                <TextView
-                    android:id="@+id/note_time"
-                    android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/selected_time_layout"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="2018年1月13日"
-                    android:textSize="15dp"
-                    android:textColor="#000"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="点击此处修改时间"
-                    android:textSize="12dp"/>
+                    android:layout_gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/note_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2018年1月13日"
+                        android:textSize="15dp"
+                        android:textColor="#000"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="点击此处修改时间"
+                        android:textSize="12dp"/>
+                </LinearLayout>
+
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="10dp">
+            android:padding="20dp">
             <TextView
-                android:id="@+id/modify_button"
+                android:id="@+id/submit_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="完成"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@drawable/submit_button"
                 android:layout_gravity="center"/>
         </LinearLayout>
 

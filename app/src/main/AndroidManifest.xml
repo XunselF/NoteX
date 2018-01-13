@@ -17,7 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
-        <activity android:name=".AddNoteActivity"></activity>
+        <activity android:name=".AddNoteActivity"
+            android:theme="@style/DatePickerStyle"></activity>
     </application>
 
 </manifest>
