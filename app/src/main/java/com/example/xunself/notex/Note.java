@@ -1,10 +1,13 @@
 package com.example.xunself.notex;
 
+import org.litepal.crud.DataSupport;
+
 /**
  * Created by XunselF on 2018/1/13.
  */
 
-public class Note {
+public class Note extends DataSupport{
+    private int id;
     private String title;
     private String content;
     private int year;
@@ -17,6 +20,10 @@ public class Note {
         this.year = year;
         this.month = month;
         this.day = day;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getTitle() {

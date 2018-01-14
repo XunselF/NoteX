@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.WindowManager;
 
+import org.litepal.LitePal;
+
 /**
  * author:XunselF (XunselF@hotmail.com)
  * 2018/1/12
@@ -37,6 +39,9 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
                 //退出全屏模式
+
+                LitePal.initialize(SplashActivity.this);
+                //数据库的初始化
 
                 Intent intent = new Intent(SplashActivity.this,MainActivity.class);
                 startActivity(intent);
