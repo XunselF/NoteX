@@ -70,6 +70,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         noteRecyclerView.setAdapter(noteAdapter);
         add_note_button.setOnClickListener(this);
 
+        mainToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.action_search:
+                        Toast.makeText(MainActivity.this,"123",Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main,menu);
+        return true;
     }
 
     /**

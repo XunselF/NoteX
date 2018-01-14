@@ -37,7 +37,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     //输入内容
     private LinearLayout addNoteLayout;
     //父布局
-    private TextView submitButton;
+    private LinearLayout submitButton;
     //确定键
 
     private int noteId;
@@ -78,7 +78,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         timeText = (TextView) findViewById(R.id.note_time);
         titleEdit = (EditText) findViewById(R.id.note_title);
         contentEdit = (EditText) findViewById(R.id.note_content);
-        submitButton = (TextView) findViewById(R.id.submit_button);
+        submitButton = (LinearLayout) findViewById(R.id.submit_button);
         addNoteLayout = (LinearLayout) findViewById(R.id.add_note_layout);
         selectTimeLayout.setOnClickListener(this);
         returnButton.setOnClickListener(this);
@@ -149,9 +149,9 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         Note note = new Note(title,content,mYear,mMonth,mDay);
         if (noteId == 0){
             if (note.save()){
-                Toast.makeText(AddNoteActivity.this,"保存成功",Toast.LENGTH_LONG).show();
+                Toast.makeText(AddNoteActivity.this,"保存成功",Toast.LENGTH_SHORT).show();
             }else{
-                Toast.makeText(AddNoteActivity.this,"保存失败",Toast.LENGTH_LONG).show();
+                Toast.makeText(AddNoteActivity.this,"保存失败",Toast.LENGTH_SHORT).show();
             }
         }else{
             ContentValues values = new ContentValues();
@@ -161,6 +161,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             values.put("month",mMonth);
             values.put("day",mDay);
             DataSupport.update(Note.class,values,noteId);
+            Toast.makeText(AddNoteActivity.this,"修改成功",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -180,7 +181,6 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.submit_button:
                 submitNote();
-
                 finish();
                 break;
             default:
