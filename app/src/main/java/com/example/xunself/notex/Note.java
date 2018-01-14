@@ -2,11 +2,13 @@ package com.example.xunself.notex;
 
 import org.litepal.crud.DataSupport;
 
+import java.io.Serializable;
+
 /**
  * Created by XunselF on 2018/1/13.
  */
 
-public class Note extends DataSupport{
+public class Note extends DataSupport implements Serializable{
     private int id;
     private String title;
     private String content;

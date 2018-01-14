@@ -2,7 +2,9 @@ package com.example.xunself.notex;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,6 +40,10 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     private TextView submitButton;
     //确定键
 
+    private int noteId;
+
+    private Note bNote;
+
 
     private Date selectedDate;
     //所选时间
@@ -47,6 +53,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     private int mMonth;
     //月
     private int mDay;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +85,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         addNoteLayout.setOnClickListener(this);
         submitButton.setOnClickListener(this);
 
-        getCurrentTime();
+        getExtraData();
     }
 
     /**
@@ -93,6 +100,24 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         mYear = calendar.get(Calendar.YEAR);
         mMonth = calendar.get(Calendar.MONTH);
         mDay = calendar.get(Calendar.DAY_OF_MONTH);
+    }
+
+    /**
+     * 获取传过来的值
+     */
+    private void getExtraData(){
+        Intent intent = getIntent();
+        bNote = (Note) intent.getSerializableExtra("extra_note");
+        if (bNote != null){
+            mYear = bNote.getYear();
+            mMonth = bNote.getMonth();
+            mDay = bNote.getDay();
+            titleEdit.setText(bNote.getTitle());
+            contentEdit.setText(bNote.getContent());
+            noteId = bNote.getId();
+        }else{
+            getCurrentTime();
+        }
     }
 
     /**
@@ -122,7 +147,21 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         String title = titleEdit.getText().toString();
         String content = contentEdit.getText().toString();
         Note note = new Note(title,content,mYear,mMonth,mDay);
-        note.save();
+        if (noteId == 0){
+            if (note.save()){
+                Toast.makeText(AddNoteActivity.this,"保存成功",Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(AddNoteActivity.this,"保存失败",Toast.LENGTH_LONG).show();
+            }
+        }else{
+            ContentValues values = new ContentValues();
+            values.put("title",title);
+            values.put("content",content);
+            values.put("year",mYear);
+            values.put("month",mMonth);
+            values.put("day",mDay);
+            DataSupport.update(Note.class,values,noteId);
+        }
     }
 
 
@@ -141,7 +180,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.submit_button:
                 submitNote();
-                Toast.makeText(AddNoteActivity.this,"保存成功",Toast.LENGTH_LONG).show();
+
                 finish();
                 break;
             default:
