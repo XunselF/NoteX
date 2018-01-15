@@ -83,7 +83,14 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         selectTimeLayout.setOnClickListener(this);
         returnButton.setOnClickListener(this);
         addNoteLayout.setOnClickListener(this);
-        submitButton.setOnClickListener(this);
+        submitButton.setOnClickListener(new NoDoubleClickListener() {
+            @Override
+            public void onClick(View view) {
+                super.onClick(view);
+                submitNote();
+                finish();
+            }
+        });
 
         getExtraData();
     }
@@ -177,10 +184,6 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                 hideInputMethod();
                 break;
             case R.id.return_button:
-                finish();
-                break;
-            case R.id.submit_button:
-                submitNote();
                 finish();
                 break;
             default:
