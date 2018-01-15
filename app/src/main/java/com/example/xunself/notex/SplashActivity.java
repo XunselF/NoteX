@@ -66,9 +66,9 @@ public class SplashActivity extends AppCompatActivity {
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
-            Note note = new Note("欢迎使用NoteX","您可以通过右下角添加键进行添加数据",year,month,day);
+            Note note = new Note("欢迎使用NoteX 说明书","首页即显示您的所保存的数据，您可以通过右下角添加键进行添加数据，在输入数据后点击完成即可保存数据。" + "\n"
+                   + "右上角的按钮可以进行对数据的查询，主要分为对文本标题的搜索与对时间上的限制进行查询。" + "\n" + "author:XunselF(XunselF@hotmail.com)",year,month,day);
             note.save();
-            DataTest.getData();
             Log.d("456","Note表不存在");
         }
     }
