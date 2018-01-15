@@ -68,6 +68,7 @@ public class SplashActivity extends AppCompatActivity {
             int day = c.get(Calendar.DAY_OF_MONTH);
             Note note = new Note("欢迎使用NoteX","您可以通过右下角添加键进行添加数据",year,month,day);
             note.save();
+            DataTest.getData();
             Log.d("456","Note表不存在");
         }
     }

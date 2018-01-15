@@ -75,7 +75,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.action_search:
-                        Toast.makeText(MainActivity.this,"123",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(MainActivity.this,SearchNoteActivity.class);
+                        startActivity(intent);
                         break;
                 }
                 return true;
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             switch (item.getItemId()){
                                 case R.id.action_note_delete:
                                     note.delete();
-                                    Toast.makeText(MainActivity.this,"删除成功！",Toast.LENGTH_LONG).show();
+                                    Toast.makeText(MainActivity.this,"删除成功！",Toast.LENGTH_SHORT).show();
                                     noteList.remove(note);
                                     noteAdapter.notifyDataSetChanged();
                                     break;

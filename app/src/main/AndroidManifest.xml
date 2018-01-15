@@ -3,13 +3,13 @@
     package="com.example.xunself.notex">
 
     <application
+        android:name="org.litepal.LitePalApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name="org.litepal.LitePalApplication">
+        android:theme="@style/AppTheme">
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,7 +18,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
-        <activity android:name=".AddNoteActivity"
+        <activity
+            android:name=".AddNoteActivity"
+            android:theme="@style/DatePickerStyle" />
+        <activity android:name=".SearchNoteActivity"
             android:theme="@style/DatePickerStyle"></activity>
     </application>
 
