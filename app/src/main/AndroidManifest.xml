@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.xunself.notex">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:name="org.litepal.LitePalApplication"
         android:allowBackup="true"
@@ -21,8 +23,10 @@
         <activity
             android:name=".AddNoteActivity"
             android:theme="@style/DatePickerStyle" />
-        <activity android:name=".SearchNoteActivity"
-            android:theme="@style/DatePickerStyle"></activity>
+        <activity
+            android:name=".SearchNoteActivity"
+            android:theme="@style/DatePickerStyle" />
+        <activity android:name=".InquireImageActivity"></activity>
     </application>
 
 </manifest>

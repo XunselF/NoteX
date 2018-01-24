@@ -67,33 +67,69 @@
 
 
     </LinearLayout>
-    <LinearLayout
-        android:id="@+id/add_note_layout"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="15dp"
-        android:layout_marginTop="30dp"
-        android:clickable="true">
-        <EditText
-            android:id="@+id/note_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/InputEditText"
-            android:hint="标题"
-            android:textSize="15dp"
-            android:padding="10dp"/>
 
-        <EditText
-            android:id="@+id/note_content"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/add_note_layout"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/InputEditText"
-            android:hint="内容"
-            android:lines="7"
-            android:textSize="15dp"
-            android:padding="10dp"
-            android:layout_marginTop="5dp"/>
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:padding="15dp"
+            android:layout_marginTop="30dp"
+            android:clickable="true">
+            <EditText
+                android:id="@+id/note_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/InputEditText"
+                android:hint="标题"
+                android:textSize="15dp"
+                android:padding="10dp"/>
+
+            <EditText
+                android:id="@+id/note_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/InputEditText"
+                android:hint="内容"
+                android:textSize="15dp"
+                android:padding="10dp"
+                android:layout_marginTop="20dp"/>
+            <LinearLayout
+                android:id="@+id/open_album_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/selected_time_layout">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_photo_album_black_24dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorPrimary"
+                    android:text="打开相册"
+                    android:layout_gravity="bottom"/>
+
+            </LinearLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="40dp">
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/noteImage_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
+            </RelativeLayout>
+
+
+
+        </LinearLayout>
+    </ScrollView>
+
 
 </LinearLayout>
