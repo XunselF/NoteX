@@ -12,6 +12,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.DocumentsContract;
@@ -19,9 +21,11 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,15 +37,18 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
+
 import org.litepal.crud.DataSupport;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
@@ -49,6 +56,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
+
 
 public class AddNoteActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -64,6 +73,8 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     //输入内容
     private LinearLayout openAlbumLayout;
     //打开相册
+    private LinearLayout openCameraLayout;
+    //打开相机
     private LinearLayout addNoteLayout;
     //父布局
     private LinearLayout submitButton;
@@ -91,6 +102,11 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     //参数 -- 打开相册
     public static final int CHOOSE_PHOTO = 1;
 
+    //参数 -- 打开相机
+    public static final int TAKE_PHOTO = 2;
+
+    private Uri cameraUri;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,6 +127,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
      */
     private void init(){
         openAlbumLayout = (LinearLayout) findViewById(R.id.open_album_layout);
+        openCameraLayout = (LinearLayout) findViewById(R.id.open_camera_layout);
         returnButton = (ImageView) findViewById(R.id.return_button);
         selectTimeLayout = (LinearLayout) findViewById(R.id.select_time);
         timeText = (TextView) findViewById(R.id.note_time);
@@ -122,10 +139,12 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         noteImageAdapter = new NoteImageAdapter();
         noteImageRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         noteImageRecyclerView.setAdapter(noteImageAdapter);
+        noteImageList = new ArrayList<>();
         selectTimeLayout.setOnClickListener(this);
         returnButton.setOnClickListener(this);
         addNoteLayout.setOnClickListener(this);
         openAlbumLayout.setOnClickListener(this);
+        openCameraLayout.setOnClickListener(this);
         submitButton.setOnClickListener(new NoDoubleClickListener() {
             @Override
             public void onClick(View view) {
@@ -144,10 +163,35 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
     private void getNoteImageData(){
         if (bNote != null){
             noteImageList = DataSupport.where("noteId = ?",noteId + "").find(NoteImage.class);
-        }else{
-            noteImageList = new ArrayList<>();
         }
         noteImageAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 打开相机
+     */
+    private void openCamera(){
+        //创建File类对象，用于储存拍照后的照片
+
+        File outputImage = new File(getExternalCacheDir(),"output_image_"+ noteId + "_" + (int)(Math.random()*9+1)*100000 + ".jpg");
+        try{
+            while(outputImage.exists()){
+                outputImage = new File(getExternalCacheDir(),"output_image_"+ noteId + "_" + (int)(Math.random()*9+1)*100000 + ".jpg");
+            }
+            outputImage.createNewFile();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        if (Build.VERSION.SDK_INT >= 24){
+            cameraUri = FileProvider.getUriForFile(AddNoteActivity.this,"com.example.cameraalbumtest.fileprovider",outputImage);
+        }else{
+            cameraUri = Uri.fromFile(outputImage);
+        }
+        //启动相机
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT,cameraUri);
+        startActivityForResult(intent,TAKE_PHOTO);
+
     }
 
     /**
@@ -212,6 +256,8 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         Note note = new Note(title,content,mYear,mMonth,mDay);
         if (noteId == 0){
             if (note.save()){
+                DataSupport.deleteAll(NoteImage.class,"noteId = ?",noteId + "");
+                DataSupport.saveAll(noteImageList);
                 Toast.makeText(AddNoteActivity.this,"保存成功",Toast.LENGTH_SHORT).show();
             }else{
                 Toast.makeText(AddNoteActivity.this,"保存失败",Toast.LENGTH_SHORT).show();
@@ -224,6 +270,11 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             values.put("month",mMonth);
             values.put("day",mDay);
             DataSupport.update(Note.class,values,noteId);
+            DataSupport.deleteAll(NoteImage.class,"noteId = ?",noteId + "");
+            for (NoteImage noteImage : noteImageList){
+                NoteImage iamge = new NoteImage(noteImage.getNoteId(),noteImage.getImage());
+                iamge.save();
+            }
             Toast.makeText(AddNoteActivity.this,"修改成功",Toast.LENGTH_SHORT).show();
         }
     }
@@ -252,6 +303,9 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                     //当已开启该权限时，将默认打开相册
                     openAlbum();
                 }
+                break;
+            case R.id.open_camera_layout:
+                openCamera();
                 break;
             default:
                 break;
@@ -302,6 +356,23 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                     }else{
                         //4.4以下对图片的处理
                         handleImageBeforeKitKat(data);
+                    }
+                }
+                break;
+            case TAKE_PHOTO:
+                if (resultCode == RESULT_OK){
+                    try{
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(cameraUri));
+                        if (bitmap != null){
+                            baos = compressImage(bitmap);
+                            byte[] image = baos.toByteArray();
+                            NoteImage noteImage = new NoteImage(noteId,image);
+                            noteImageList.add(noteImage);
+                            noteImageAdapter.notifyDataSetChanged();
+                        }
+                    }catch (FileNotFoundException e){
+                        e.printStackTrace();
                     }
                 }
                 break;
@@ -370,7 +441,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         if (imagePath != null){
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-            bitmap.compress(Bitmap.CompressFormat.PNG,100,baos);
+            baos = compressImage(bitmap);
             byte[] image = baos.toByteArray();
             NoteImage noteImage = new NoteImage(noteId,image);
             noteImageList.add(noteImage);
@@ -422,7 +493,26 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             final NoteImage noteImage = noteImageList.get(position);
             Glide.with(AddNoteActivity.this)
                     .load(noteImage.getImage())
+                    .override(600, 400)
+                    .centerCrop()
                     .into(holder.noteImage);
+            holder.imageItemLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(AddNoteActivity.this,InquireImageActivity.class);
+                    int id;
+                    if (noteImage == DataSupport.where("id = ?",noteImage.getId() + "").findFirst(NoteImage.class)){
+                        intent.putExtra("extra_isExist",true);
+                        id = noteImage.getId();
+                    }else{
+                        NoteImage noteImageSave = new NoteImage(noteImage.getNoteId(),noteImage.getImage());
+                        noteImageSave.save();
+                        id = noteImageSave.getId();
+                    }
+                    intent.putExtra("extra_image_id",id);
+                    startActivity(intent);
+                }
+            });
             holder.imageItemLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
@@ -437,9 +527,17 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                                     noteImageAdapter.notifyDataSetChanged();
                                     break;
                                 case R.id.action_image_inquire:
-                                    noteImage.save();
                                     Intent intent = new Intent(AddNoteActivity.this,InquireImageActivity.class);
-                                    intent.putExtra("extra_image_id",noteImage.getId());
+                                    int id;
+                                    if (noteImage == DataSupport.where("id = ?",noteImage.getId() + "").findFirst(NoteImage.class)){
+                                        intent.putExtra("extra_isExist",true);
+                                        id = noteImage.getId();
+                                    }else{
+                                        NoteImage noteImageSave = new NoteImage(noteImage.getNoteId(),noteImage.getImage());
+                                        noteImageSave.save();
+                                        id = noteImageSave.getId();
+                                    }
+                                    intent.putExtra("extra_image_id",id);
                                     startActivity(intent);
                                     break;
                             }
@@ -457,28 +555,56 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             return noteImageList.size();
         }
 
-        /**
-         * blob转byte[]
-         */
-        private byte[] blobToBytes(Blob blob){
-            InputStream is = null;
-            byte[] b = null;
-            try{
-                is = blob.getBinaryStream();
-                b = new byte[(int) blob.length()];
-                is.read(b);
-                return b;
-            }catch(Exception e){
-                e.printStackTrace();
-            }finally{
-                try{
-                    is.close();
-                    is = null;
-                }catch(IOException e){
-                    e.printStackTrace();
-                }
-            }
-            return b;
-        }
+
     }
+
+    /**
+     * 质量压缩法
+     * @param bitmap
+     * @return
+     */
+    private ByteArrayOutputStream compressImage(Bitmap bitmap){
+        //质量压缩法
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap = getRatioSize(bitmap);//尺寸压缩法
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);//100表示不压缩，把压缩后的数据放在baos中
+        int options = 100;
+        while(baos.toByteArray().length / 1024 > 100){
+            //循环判断如果压缩后是否大于100kb，大于继续压缩
+            baos.reset();//重置baos
+            bitmap.compress(Bitmap.CompressFormat.JPEG,options,baos);//压缩
+            options -= 10;  //每次都减少10
+        }
+        return baos;
+    }
+
+    /**
+     * 尺寸压缩法 获取压缩倍数
+     */
+    private Bitmap getRatioSize(Bitmap bitmap){
+        //图片大小
+        int bitWidth = bitmap.getWidth();
+        int bitHeight = bitmap.getHeight();
+        //图片最大分辨率
+        int imageHeight = 1280;
+        int imageWidth = 960;
+        //缩放比
+        int ratio = 1;
+        if (bitWidth > bitHeight & bitWidth > imageWidth){
+            //如果图片宽度大于高度，以宽度为基准
+            ratio = bitWidth / imageWidth;
+        }else if (bitWidth < bitHeight && bitHeight > imageHeight){
+            //如果图片高度大于宽度大，以高度为基准
+            ratio = bitHeight / imageHeight;
+        }
+        //最小比率为1
+        if (ratio <= 0)
+            ratio = 1;
+        Bitmap result = Bitmap.createBitmap(bitWidth / ratio,bitHeight / ratio, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+        Rect rect = new Rect(0,0,bitWidth / ratio,bitHeight / ratio);
+        canvas.drawBitmap(bitmap,null,rect,null);
+        return result;
+    }
+
 }

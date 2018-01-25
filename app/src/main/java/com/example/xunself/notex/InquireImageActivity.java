@@ -10,6 +10,8 @@ import com.bumptech.glide.Glide;
 
 import org.litepal.crud.DataSupport;
 
+import java.util.List;
+
 public class InquireImageActivity extends AppCompatActivity {
 
     private ImageView noteImage;
@@ -30,6 +32,7 @@ public class InquireImageActivity extends AppCompatActivity {
      */
     private void init(){
         int imageId = getIntent().getIntExtra("extra_image_id",0);
+        List<NoteImage> images = DataSupport.findAll(NoteImage.class);
         image = DataSupport.where("id = ?",imageId + "").find(NoteImage.class).get(0);
         imageByte = image.getImage();
 
@@ -37,6 +40,14 @@ public class InquireImageActivity extends AppCompatActivity {
         Glide.with(InquireImageActivity.this)
                 .load(imageByte)
                 .into(noteImage);
-        image.delete();
+        if (!getIntent().getBooleanExtra("extra_isExist",false)){
+            image.delete();
+        }
+        noteImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 }

@@ -97,24 +97,51 @@
                 android:textSize="15dp"
                 android:padding="10dp"
                 android:layout_marginTop="20dp"/>
+
             <LinearLayout
-                android:id="@+id/open_album_layout"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/selected_time_layout">
-                <ImageView
+                android:layout_marginTop="20dp">
+
+                <LinearLayout
+                    android:id="@+id/open_camera_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_photo_album_black_24dp"/>
-                <TextView
+                    android:background="@drawable/selected_time_layout">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_camera_alt_black_24dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorPrimary"
+                        android:text="拍照"
+                        android:layout_gravity="bottom"/>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/open_album_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/colorPrimary"
-                    android:text="打开相册"
-                    android:layout_gravity="bottom"/>
+                    android:layout_marginLeft="30dp"
+                    android:background="@drawable/selected_time_layout">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_photo_album_black_24dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorPrimary"
+                        android:text="打开相册"
+                        android:layout_gravity="bottom"/>
+
+                </LinearLayout>
+
 
             </LinearLayout>
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
