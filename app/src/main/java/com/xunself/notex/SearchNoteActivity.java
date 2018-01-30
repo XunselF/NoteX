@@ -1,4 +1,4 @@
-package com.example.xunself.notex;
+package com.xunself.notex;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package com.example.xunself.notex;
+package com.xunself.notex;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -13,7 +13,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.DocumentsContract;
@@ -57,6 +59,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+
+import id.zelory.compressor.Compressor;
 
 
 public class AddNoteActivity extends AppCompatActivity implements View.OnClickListener{
@@ -256,8 +260,10 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         Note note = new Note(title,content,mYear,mMonth,mDay);
         if (noteId == 0){
             if (note.save()){
-                DataSupport.deleteAll(NoteImage.class,"noteId = ?",noteId + "");
-                DataSupport.saveAll(noteImageList);
+                for (NoteImage noteImage : noteImageList){
+                    NoteImage iamge = new NoteImage(note.getId(),noteImage.getImage());
+                    iamge.save();
+                }
                 Toast.makeText(AddNoteActivity.this,"保存成功",Toast.LENGTH_SHORT).show();
             }else{
                 Toast.makeText(AddNoteActivity.this,"保存失败",Toast.LENGTH_SHORT).show();
@@ -367,6 +373,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
                         if (bitmap != null){
                             baos = compressImage(bitmap);
                             byte[] image = baos.toByteArray();
+                            Log.d("bitmap","byte is : " + (image.length / 1024) + "kb");
                             NoteImage noteImage = new NoteImage(noteId,image);
                             noteImageList.add(noteImage);
                             noteImageAdapter.notifyDataSetChanged();
@@ -446,6 +453,8 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             NoteImage noteImage = new NoteImage(noteId,image);
             noteImageList.add(noteImage);
             noteImageAdapter.notifyDataSetChanged();
+
+            Log.d("bitmap","byte is : " + (image.length / 1024) + "kb");
         }else{
             Toast.makeText(AddNoteActivity.this,"错误图片显示",Toast.LENGTH_SHORT).show();
         }
@@ -567,7 +576,9 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         //质量压缩法
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap = getRatioSize(bitmap);//尺寸压缩法
-        bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);//100表示不压缩，把压缩后的数据放在baos中
+
+        Log.d("bitmap","bitmap width : " + bitmap.getWidth() + ",bitmap height : " + bitmap.getHeight());
+        bitmap.compress(Bitmap.CompressFormat.WEBP,100,baos);//75表示不压缩，把压缩后的数据放在baos中
         int options = 100;
         while(baos.toByteArray().length / 1024 > 100){
             //循环判断如果压缩后是否大于100kb，大于继续压缩
@@ -575,6 +586,8 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
             bitmap.compress(Bitmap.CompressFormat.JPEG,options,baos);//压缩
             options -= 10;  //每次都减少10
         }
+
+        Log.d("bitmap","bitmap width : " + bitmap.getWidth() + ",bitmap height : " + bitmap.getHeight() + ",options : " + options );
         return baos;
     }
 
@@ -590,7 +603,7 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         int imageWidth = 960;
         //缩放比
         int ratio = 1;
-        if (bitWidth > bitHeight & bitWidth > imageWidth){
+        if (bitWidth >= bitHeight & bitWidth > imageWidth){
             //如果图片宽度大于高度，以宽度为基准
             ratio = bitWidth / imageWidth;
         }else if (bitWidth < bitHeight && bitHeight > imageHeight){
@@ -600,10 +613,15 @@ public class AddNoteActivity extends AppCompatActivity implements View.OnClickLi
         //最小比率为1
         if (ratio <= 0)
             ratio = 1;
+
+
+
+
         Bitmap result = Bitmap.createBitmap(bitWidth / ratio,bitHeight / ratio, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);
         Rect rect = new Rect(0,0,bitWidth / ratio,bitHeight / ratio);
         canvas.drawBitmap(bitmap,null,rect,null);
+        Log.d("bitmap","bitmap width : " + bitmap.getWidth() + ",bitmap height : " + bitmap.getHeight() + ",ratio is : " + ratio);
         return result;
     }
 

@@ -1,4 +1,4 @@
-package com.example.xunself.notex;
+package com.xunself.notex;
 
 import java.util.Random;
 

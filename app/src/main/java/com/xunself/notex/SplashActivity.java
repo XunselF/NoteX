@@ -1,4 +1,4 @@
-package com.example.xunself.notex;
+package com.xunself.notex;
 
 import android.content.Intent;
 import android.os.Handler;

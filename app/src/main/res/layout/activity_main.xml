@@ -37,6 +37,6 @@
         android:src="@drawable/ic_playlist_add_white_18dp"
         app:backgroundTint="@color/colorPrimary"
         app:rippleColor="#f9f9f9"
-        app:layout_behavior="com.example.xunself.notex.ScrollAwareFABBehavior"
+        app:layout_behavior="com.xunself.notex.ScrollAwareFABBehavior"
         />
 </android.support.design.widget.CoordinatorLayout>

@@ -1,4 +1,4 @@
-package com.example.xunself.notex;
+package com.xunself.notex;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

@@ -32,8 +32,8 @@
     	</list>
     -->
     <list>
-        <mapping class="com.example.xunself.notex.Note"/>
-        <mapping class="com.example.xunself.notex.NoteImage"/>
+        <mapping class="com.xunself.notex.Note"/>
+        <mapping class="com.xunself.notex.NoteImage"/>
     </list>
 
     <!--
