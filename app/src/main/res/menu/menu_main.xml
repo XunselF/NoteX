@@ -3,6 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.xunself.notex.MainActivity">
     <item
+        android:id="@+id/action_create_excel"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_note_add_white_24dp"
+        android:title="创建Excel表"
+        app:showAsAction="always"/>
+    <item
         android:id="@+id/action_search"
         android:orderInCategory="100"
         android:icon="@drawable/ic_youtube_searched_for_white_24dp"

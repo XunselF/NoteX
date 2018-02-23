@@ -1,9 +1,15 @@
 package com.xunself.notex;
 
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,11 +22,14 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.xunself.XExcelCreator.XExcelCreator;
 
 import org.litepal.crud.DataSupport;
 
@@ -30,6 +39,9 @@ import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+
+    //权限申请请求码
+    public static final int PERMISSION_REQUEST_CODE = 1000;
 
     private FloatingActionButton add_note_button;
     //添加事件按钮
@@ -79,6 +91,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     case R.id.action_search:
                         Intent intent = new Intent(MainActivity.this,SearchNoteActivity.class);
                         startActivity(intent);
+                        break;
+                    case R.id.action_create_excel:
+                        //权限检查
+                        checkPermission();
                         break;
                 }
                 return true;
@@ -220,4 +236,85 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch(requestCode){
+            case PERMISSION_REQUEST_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    //当权限开启时
+                    createExcel();
+                }else{
+                    //提示
+                    Toast.makeText(this,"权限并没有开启！请手动开启",Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
+
+    /**
+     * 对权限的检查
+     */
+    private void checkPermission(){
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            //对权限进行申请
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE },PERMISSION_REQUEST_CODE);
+        }else{
+            //权限已开 弹出询问弹窗
+            createExcel();
+        }
+    }
+
+    /**
+     *  创建excel表格
+     */
+    private void createExcel(){
+        final View view = LayoutInflater.from(this).inflate(R.layout.create_excel_dialog,null);
+        final EditText inputFileName = (EditText) view.findViewById(R.id.input_filename); //输入文件名
+        TextView createExcelButton = (TextView) view.findViewById(R.id.create_excel_button);
+        TextView cancelButton = (TextView) view.findViewById(R.id.cancel_button);
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view)
+                .setCancelable(true)
+                .show();
+        //创建Excel表按钮
+        createExcelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String fileName = inputFileName.getText().toString().trim();
+                //判断数据是否存在 是否填写了文件名
+                if (noteList.size() == 0){
+                    Toast.makeText(MainActivity.this,"创建错误！列表不存在数据",Toast.LENGTH_SHORT).show();
+                }else if (fileName == null || fileName.equals("")){
+                    Toast.makeText(MainActivity.this,"创建错误！您没有填写文件名",Toast.LENGTH_SHORT).show();
+                }else{
+                    //创建表
+                    XExcelCreator creator = new XExcelCreator(fileName,fileName,0);
+                    creator.createAllTexts(new String[]{"时间","标题","内容"});
+                    creator.setmWidth(300);
+                    creator.setmHeight(30);
+                    for (int j = 0; j < noteList.size(); j++){
+                        Note note = noteList.get(j);
+                        String[] texts = {note.getYear() + "-" +  (note.getMonth() + 1) + "-" + note.getDay(),
+                                note.getTitle(),note.getContent()};
+                        creator.createAllTexts(texts);      //保存数据
+                    }
+                    creator.writeData();
+                    dialog.dismiss();
+                    Toast.makeText(MainActivity.this,"创建excel表！",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        //取消按钮
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+    }
+
+
 }
